@@ -5,8 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.lj.rmusic.base.BasePresenter;
+import com.lj.rmusic.interfaceO.ISongView;
 
-public abstract class BaseActivity<V, T extends BasePresenter<V>> extends AppCompatActivity {
+public abstract class BaseActivity<V extends ISongView, T extends BasePresenter<V>> extends AppCompatActivity {
     protected T mPresenter;
 
     @Override

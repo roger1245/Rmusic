@@ -6,22 +6,93 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            android:layout_height="match_parent">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-        </android.support.v7.widget.Toolbar>
-    </FrameLayout>
+            </android.support.v7.widget.Toolbar>
+            <FrameLayout
+                android:id="@+id/front_container"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_below="@id/toolbar">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RelativeLayout
+                        android:id="@+id/front_image_view_relative"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="42dp"
+                        android:layout_height="238dp">
+                        <ImageView
+                            android:id="@+id/front_image_view"
+                            android:layout_width="220dp"
+                            android:layout_height="220dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerInParent="true"
+
+                            android:scaleType="fitCenter" />
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/front_song_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/front_image_view_relative"
+                        android:layout_marginTop="32dp"
+                        android:textSize="16sp"
+                        android:text="歌名"
+                        android:layout_centerHorizontal="true"/>
+                    <TextView
+                        android:id="@+id/front_song_singer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="歌手"
+                        android:textSize="14sp"
+                        android:layout_below="@id/front_song_name"
+                        android:layout_marginTop="15dp"
+                        android:layout_centerHorizontal="true"/>
+                </RelativeLayout>
+
+
+            </FrameLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_mood_happy"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginBottom="49dp"
+                android:clickable="true"
+                android:layout_marginLeft="31dp"/>
+            <ImageView
+                android:id="@+id/music_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_music_detail"
+                android:layout_marginBottom="49dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:clickable="true"
+                android:layout_marginRight="31dp"/>
+        </RelativeLayout>
+
+    <!--</FrameLayout>-->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="match_parent"

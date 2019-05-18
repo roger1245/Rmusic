@@ -27,7 +27,7 @@ public class SongPresenter extends BasePresenter {
                     public void showResponse(String response) {
 //                        parseJsonMoodSong(response);
                         playList = parseJsonSongList(response);
-                        Log.d(TAG, playList.toString());
+                        getView().showSongs(playList);
                     }
                 });
             }

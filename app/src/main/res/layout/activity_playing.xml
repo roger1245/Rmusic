@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.PlayingActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/play_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    <TextView
+        android:id="@+id/play_singer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_below="@+id/play_toolbar"
+        android:text="歌手"
+        android:layout_centerHorizontal="true"/>
+    <ImageView
+        android:id="@+id/play_image_view"
+        android:layout_width="210dp"
+        android:layout_height="345dp"
+        android:layout_below="@id/play_singer"
+        android:layout_marginTop="22dp"
+        android:scaleType="fitCenter"
+        android:layout_centerHorizontal="true"/>
+    <LinearLayout
+        android:layout_above="@id/play_seek_bar"
+        android:layout_marginBottom="33dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/play_download"
+            android:src="@drawable/ic_download"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/play_star"
+            android:src="@drawable/ic_star_off"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/play_like"
+            android:src="@drawable/ic_like_off"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/play_comment"
+            android:src="@drawable/ic_comment"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/play_seek_bar"
+        android:layout_above="@id/play_play"
+        android:layout_marginBottom="29dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/play_left"
+        android:src="@drawable/ic_move_back"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/play_play"
+        android:layout_marginRight="27dp"
+        android:layout_marginBottom="49dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/play_play"
+        android:src="@drawable/ic_list_play"
+        android:layout_marginBottom="49dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/play_right"
+        android:src="@drawable/ic_move_forward"
+        android:layout_toEndOf="@id/play_play"
+        android:layout_marginLeft="27dp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="49dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/play_play" />
+
+    
+</RelativeLayout>
