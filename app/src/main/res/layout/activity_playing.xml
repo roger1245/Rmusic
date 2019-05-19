@@ -34,8 +34,7 @@
         android:id="@+id/play_lrc_view"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginBottom="54dp"
-        android:layout_marginTop="51dp"
+        android:layout_margin="5dp"
         android:layout_below="@id/play_image_view"/>
     <LinearLayout
         android:layout_above="@id/play_seek_bar"
