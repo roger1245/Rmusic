@@ -6,14 +6,23 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.SeekBar;
 
 import java.io.IOException;
 
-public class PlayService extends Service implements MediaPlayer.OnPreparedListener {
+public class PlayService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener{
 
     public static final String TAG = "PlayService";
     private LocalService mBinder = new LocalService();
     private MediaPlayer mPlayer = null;
+    private PlayManager playManager;
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        playManager = PlayManager.getInstance();
+    }
 
     @Override
     public void onDestroy() {
@@ -24,7 +33,21 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
+//        playManager.setDuration(mp.getDuration());
     }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        playManager.next();
+    }
+
+
+//    @Override
+//    public boolean onError(MediaPlayer mp, int what, int extra) {
+//        ensurePlayer();
+//        playManager.play();
+//        return false;
+//    }
 
 
     public class LocalService extends Binder {
@@ -44,7 +67,7 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
         try {
             mPlayer.setDataSource(path);
             mPlayer.setOnPreparedListener(this);
-
+            mPlayer.setOnCompletionListener(this);
 //            onPrepare();
 //            setPlayerState(STATE_INITIALIZED);
             mPlayer.prepareAsync();
@@ -56,6 +79,32 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
 //            releasePlayer();
         }
     }
+
+//    public int getDuration() {
+//        if (mPlayer != null && mPlayer.isPlaying()) {
+//            return mPlayer.getDuration();
+//        }
+//        return 0;
+//    }
+    public boolean isPlaying() {
+        if (mPlayer != null) {
+            return mPlayer.isPlaying();
+        }
+        return false;
+    }
+    public void play() {
+        mPlayer.start();
+    }
+    public void pause() {
+        mPlayer.pause();
+//        Log.d(TAG, "this");
+    }
+
+//    private void seekTo(int millsecs) {
+//        if (mPlayer != null) {
+//            mPlayer.seekTo(millsecs);
+//        }
+//    }
 //    public void onComplete(MediaPlayer.OnCompletionListener listener) {
 //        mPlayer.setOnCompletionListener(listener);
 //    }
@@ -72,6 +121,8 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
     private void ensurePlayer () {
         if (mPlayer == null) {
             mPlayer = new MediaPlayer();
+        } else {
+            mPlayer.reset();
         }
     }
 }

@@ -103,6 +103,12 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        upDateUI();
+    }
+
+    @Override
     protected BasePresenter<ISongView> createPresenter() {
         return new SongPresenter();
     }
@@ -117,6 +123,13 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
         }
         return true;
     }
+    private void upDateUI() {
+        if (playManager.getNowSong() != null) {
+            songName.setText(playManager.getNowSong().getName());
+            singer.setText(playManager.getNowSong().getArs().get(0).getName());
+            ImageLoader.build(this).bindBitmap(playManager.getNowSong().getAl().getPicUrl(), roundImage);
+        }
+    }
 
     @Override
     public void showSongs(PlayList playList) {
@@ -126,11 +139,10 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                songName.setText(playManager.getNowSong().getName());
-                singer.setText(playManager.getNowSong().getArs().get(0).getName());
+                upDateUI();
             }
         });
-        ImageLoader.build(this).bindBitmap(playManager.getNowSong().getAl().getPicUrl(), roundImage);
+
 
     }
 
@@ -138,4 +150,6 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     public void onMoodChange() {
 
     }
+
+
 }

@@ -65,6 +65,20 @@
         android:layout_marginBottom="29dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/play_now_time"
+        android:layout_below="@id/play_seek_bar"
+        android:layout_alignLeft="@id/play_seek_bar"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/play_max_time"
+        android:layout_alignRight="@id/play_seek_bar"
+        android:layout_below="@id/play_seek_bar"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <ImageView
         android:id="@+id/play_left"
         android:src="@drawable/ic_move_back"
@@ -76,7 +90,7 @@
         android:layout_height="wrap_content" />
     <ImageView
         android:id="@+id/play_play"
-        android:src="@drawable/ic_list_play"
+        android:src="@drawable/ic_play_running"
         android:layout_marginBottom="49dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

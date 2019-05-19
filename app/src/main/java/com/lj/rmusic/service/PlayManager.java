@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.bean.Track;
@@ -14,7 +15,7 @@ import com.lj.rmusic.util.ApiUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayManager  {
+public class PlayManager {
     private static final String TAG = PlayManager.class.getSimpleName();
 
     private static PlayManager sManager = null;
@@ -22,7 +23,8 @@ public class PlayManager  {
     private PlayService playService;
 
 
-    private int position = 1;
+
+    private int position = 0;
 
     public synchronized static PlayManager getInstance() {
         if (sManager == null) {
@@ -36,8 +38,6 @@ public class PlayManager  {
         public void onServiceConnected(ComponentName name, IBinder service) {
             mLocalService = (PlayService.LocalService) service;
             playService = mLocalService.getService();
-//            playService.onPrepare(PlayManager.getInstance());
-//            playService.onComplete(PlayManager.getInstance());
 
 
         }
@@ -71,30 +71,76 @@ public class PlayManager  {
         context.stopService(new Intent(context, PlayService.class));
     }
     public Track getNowSong() {
-        return songs.get(position);
+        if (position < songs.size()) {
+            return songs.get(position);
+        }
+        return null;
     }
     public boolean next() {
         if (position + 1 < songs.size()) {
             position++;
+            play(position);
+            Log.d(TAG, "next" + position);
             return true;
         } else {
             position = 0;
+            play(position);
             return false;
         }
+
     }
 
     public boolean pre() {
-        if (position - 1 < 0) {
+        if (position - 1 >= 0) {
             position--;
+            play(position);
+            Log.d(TAG, "next" + position);
             return true;
         } else {
             position = songs.size() - 1;
+            play(position);
             return false;
         }
+    }
+    private int duration = 0;
+    public int getDuration() {
+        return duration;
+    }
+//    public void setDuration(int millsecs) {
+////        millsecs
+//        duration = millsecs;
+//    }
+
+//    public void playOrPause() {
+//        try {
+//            if (playService != null) {
+//                if (playService.isPlaying()) {
+//                    playService.pause();
+//                } else {
+//                    playService.play();
+//                }
+//            }
+//        } catch (final Exception ignored) {
+//        }
+//    }
+    public void play() {
+        Log.d(TAG, "Play" + String.valueOf(position));
+        playService.play();
+    }
+    public void pause() {
+        Log.d(TAG, "Pause" + String.valueOf(position));
+        playService.pause();
+    }
+
+    public boolean isPlaying() {
+        return playService.isPlaying();
     }
 
 //    @Override
 //    public void onCompletion(MediaPlayer mp) {
+//        if (mp == null) {
+//            mp = new MediaPlayer();
+//        }
 //        try {
 //            mp.reset();
 //            mp.setDataSource(ApiUtil.getSongFile(songs.get(position).getId()));
