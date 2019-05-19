@@ -1,6 +1,6 @@
 package com.lj.rmusic.util;
 
-import com.lj.rmusic.CallBackListener;
+import com.lj.rmusic.interfaceO.CallBackListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;

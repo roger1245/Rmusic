@@ -33,7 +33,8 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-//        playManager.setDuration(mp.getDuration());
+        Log.d(TAG, "" + mp.getDuration());
+        playManager.setDuration(mp.getDuration());
     }
 
     @Override
@@ -48,6 +49,13 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
 //        playManager.play();
 //        return false;
 //    }
+
+    public int getCurrentPosition() {
+        if (mPlayer.isPlaying()) {
+            return mPlayer.getCurrentPosition();
+        }
+        return 0;
+    }
 
 
     public class LocalService extends Binder {
@@ -91,6 +99,12 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
             return mPlayer.isPlaying();
         }
         return false;
+    }
+
+    public void seekTo(int progress) {
+        if (mPlayer != null) {
+            mPlayer.seekTo(progress);
+        }
     }
     public void play() {
         mPlayer.start();

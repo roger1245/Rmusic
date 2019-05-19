@@ -1,4 +1,4 @@
-package com.lj.rmusic;
+package com.lj.rmusic.interfaceO;
 
 public interface CallBackListener {
     void showResponse(String response);

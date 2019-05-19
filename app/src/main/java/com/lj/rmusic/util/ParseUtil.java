@@ -1,16 +1,25 @@
 package com.lj.rmusic.util;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import com.lj.rmusic.bean.MoodSong;
 import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.bean.Track;
+import com.lj.rmusic.widget.lrc.LrcRow;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParseUtil {
+    private static final String TAG = "ParseUtil";
 
     public static MoodSong parseMoodSong(String response) {
         MoodSong song = null;
@@ -82,4 +91,66 @@ public class ParseUtil {
         al1.setPicUrl(al.getString("picUrl"));
         return al1;
     }
-}
+    public static String parseLrc(String response){
+        String s = null;
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject lrc = jsonObject.getJSONObject("lrc");
+            s = lrc.getString("lyric");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static List<LrcRow> getLrcRows(String str) {
+//        Log.d(TAG, "str");
+//        Log.d(TAG, str);
+
+        if (TextUtils.isEmpty(str)) {
+            return null;
+        }
+        BufferedReader br = new BufferedReader(new StringReader(str));
+
+        List<LrcRow> lrcRows = new ArrayList<LrcRow>();
+        String lrcLine;
+        String preLine = null;
+        try {
+            br.readLine();
+            br.readLine();
+            while ((lrcLine = br.readLine()) != null) {
+//                Log.d(TAG, "lrcLine =========="  + lrcLine);
+                if (preLine == null) {
+                    preLine = "[" + "00:00:00" + "]";
+                }
+                List<LrcRow> rows = LrcRow.createRows(lrcLine, preLine);
+                if (rows != null && rows.size() > 0) {
+                    lrcRows.addAll(rows);
+                    preLine = "[" + rows.get(0).getTimeStr() + "]";
+                    Log.d(TAG, rows.get(0).toString());
+                }
+
+
+            }
+            Collections.sort(lrcRows);
+            int len = lrcRows.size();
+            for (int i = 0; i < len - 1; i++) {
+                lrcRows.get(i).setTotalTime(lrcRows.get(i + 1).getTime() - lrcRows.get(i).getTime());
+            }
+            lrcRows.get(len - 1).setTotalTime(5000);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return lrcRows;
+    }
+ }

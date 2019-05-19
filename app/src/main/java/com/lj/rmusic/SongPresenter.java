@@ -5,6 +5,7 @@ import android.util.Log;
 import com.lj.rmusic.base.BasePresenter;
 import com.lj.rmusic.bean.MoodSong;
 import com.lj.rmusic.bean.PlayList;
+import com.lj.rmusic.interfaceO.CallBackListener;
 import com.lj.rmusic.util.ApiUtil;
 import com.lj.rmusic.util.HttpUtil;
 import com.lj.rmusic.util.ParseUtil;
@@ -60,5 +61,21 @@ public class SongPresenter extends BasePresenter {
     }
     private MoodSong parseMoodSong(String response) {
        return ParseUtil.parseMoodSong(response);
+    }
+
+    public static void fetchLrc(int id, final CallBackListener callBackListener) {
+        final String url = ApiUtil.getLyric(id);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                HttpUtil.sendHttpRequest(url, false, new CallBackListener() {
+//                    @Override
+//                    public void showResponse(String response) {
+//                        String lrc = ParseUtil.parseLrc(response);
+//                    }
+//                });
+                HttpUtil.sendHttpRequest(url, false, callBackListener);
+            }
+        }).start();
     }
 }

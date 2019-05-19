@@ -106,6 +106,7 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     protected void onResume() {
         super.onResume();
         upDateUI();
+
     }
 
     @Override

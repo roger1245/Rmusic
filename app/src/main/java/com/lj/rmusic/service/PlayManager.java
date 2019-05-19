@@ -4,12 +4,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
+import com.lj.rmusic.SongPresenter;
 import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.bean.Track;
+import com.lj.rmusic.interfaceO.CallBackListener;
+import com.lj.rmusic.interfaceO.OnPlayEventListener;
+import com.lj.rmusic.interfaceO.ServiceCallback;
 import com.lj.rmusic.util.ApiUtil;
 
 import java.util.ArrayList;
@@ -17,12 +22,11 @@ import java.util.List;
 
 public class PlayManager {
     private static final String TAG = PlayManager.class.getSimpleName();
-
     private static PlayManager sManager = null;
     private PlayService.LocalService mLocalService;
     private PlayService playService;
-
-
+    private List<OnPlayEventListener> listeners = new ArrayList<>();
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     private int position = 0;
 
@@ -32,6 +36,8 @@ public class PlayManager {
         }
         return sManager;
     }
+
+
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -56,16 +62,22 @@ public class PlayManager {
     }
     public void play(int i) {
         playService.startPlayer(ApiUtil.getSongFile(songs.get(i).getId()));
+        handler.post(mPublishRunnable);
     }
 
     public void bindService(Context context) {
         context.bindService(new Intent(context, PlayService.class), connection, Context.BIND_AUTO_CREATE);
     }
+//    public void bindService(Context context, ServiceCallback callBackListener) {
+//        context.bindService(new Intent(context, PlayService.class), connection, Context.BIND_AUTO_CREATE);
+//        this.callBackListener = callBackListener;
+//    }
     public void startPlayService (Context context) {
         context.startService(new Intent(context, PlayService.class));
     }
     public void unBindService(Context context) {
         context.unbindService(connection);
+//        this.callBackListener = null;
     }
     public void stopPlayService(Context context) {
         context.stopService(new Intent(context, PlayService.class));
@@ -106,10 +118,16 @@ public class PlayManager {
     public int getDuration() {
         return duration;
     }
-//    public void setDuration(int millsecs) {
-////        millsecs
-//        duration = millsecs;
-//    }
+
+    public void setDuration(int millsecs) {
+//        millsecs
+        duration = millsecs;
+        Log.d(TAG, "setDUratio");
+//        if (callBackListener != null) {
+//            callBackListener.duration(millsecs);
+//        }
+
+    }
 
 //    public void playOrPause() {
 //        try {
@@ -126,33 +144,47 @@ public class PlayManager {
     public void play() {
         Log.d(TAG, "Play" + String.valueOf(position));
         playService.play();
+        handler.post(mPublishRunnable);
+        for (OnPlayEventListener listener : listeners) {
+            listener.publish(0);
+        }
     }
     public void pause() {
         Log.d(TAG, "Pause" + String.valueOf(position));
         playService.pause();
+        handler.removeCallbacks(mPublishRunnable);
     }
 
     public boolean isPlaying() {
         return playService.isPlaying();
     }
 
-//    @Override
-//    public void onCompletion(MediaPlayer mp) {
-//        if (mp == null) {
-//            mp = new MediaPlayer();
-//        }
-//        try {
-//            mp.reset();
-//            mp.setDataSource(ApiUtil.getSongFile(songs.get(position).getId()));
-//            mp.setOnPreparedListener(this);
-//            mp.prepareAsync();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void addOnPlayEventListener(OnPlayEventListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+    public void removeOnPlayEventListener(OnPlayEventListener listener) {
+        listeners.remove(listener);
+    }
+
+    private Runnable mPublishRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isPlaying()) {
+                for (OnPlayEventListener listener : listeners) {
+                    listener.publish(playService.getCurrentPosition());
+                }
+            }
+            handler.postDelayed(this, 1000);
+        }
+    };
+    public void seekTo(int progress) {
+        playService.seekTo(progress);
+    }
+
+//    public void getLrc(CallBackListener callBackListener) {
+//        SongPresenter.fetchLrc(songs.get(position).getId(), callBackListener);
 //    }
-//
-//    @Override
-//    public void onPrepared(MediaPlayer mp) {
-//        mp.start();
-//    }
+
 }
