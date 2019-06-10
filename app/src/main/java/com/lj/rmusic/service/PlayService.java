@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.widget.SeekBar;
 
@@ -33,8 +35,14 @@ public class PlayService extends Service implements MediaPlayer.OnPreparedListen
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
-        Log.d(TAG, "" + mp.getDuration());
+//        Log.d(TAG, "" + mp.getDuration());
         playManager.setDuration(mp.getDuration());
+        Handler handler;
+        if ((handler = playManager.getHandler2()) != null) {
+            Message message  = new Message();
+            message.what = 1;
+            handler.sendMessage(message);
+        }
     }
 
     @Override

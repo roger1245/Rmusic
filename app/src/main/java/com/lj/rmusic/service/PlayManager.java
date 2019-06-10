@@ -9,12 +9,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
-import com.lj.rmusic.SongPresenter;
 import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.bean.Track;
-import com.lj.rmusic.interfaceO.CallBackListener;
 import com.lj.rmusic.interfaceO.OnPlayEventListener;
-import com.lj.rmusic.interfaceO.ServiceCallback;
 import com.lj.rmusic.util.ApiUtil;
 
 import java.util.ArrayList;
@@ -28,6 +25,13 @@ public class PlayManager {
     private List<OnPlayEventListener> listeners = new ArrayList<>();
     private Handler handler = new Handler(Looper.getMainLooper());
 
+    public Handler getHandler2() {
+        return handler2;
+    }
+
+    private Handler handler2;
+
+
     private int position = 0;
 
     public synchronized static PlayManager getInstance() {
@@ -37,6 +41,9 @@ public class PlayManager {
         return sManager;
     }
 
+    public void setHandler2(Handler handler2) {
+        this.handler2 = handler2;
+    }
 
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -60,6 +67,7 @@ public class PlayManager {
     public void add(PlayList playListList) {
         songs.addAll(playListList.getTracks());
     }
+
     public void play(int i) {
         playService.startPlayer(ApiUtil.getSongFile(songs.get(i).getId()));
         handler.post(mPublishRunnable);
@@ -68,26 +76,31 @@ public class PlayManager {
     public void bindService(Context context) {
         context.bindService(new Intent(context, PlayService.class), connection, Context.BIND_AUTO_CREATE);
     }
-//    public void bindService(Context context, ServiceCallback callBackListener) {
+
+    //    public void bindService(Context context, ServiceCallback callBackListener) {
 //        context.bindService(new Intent(context, PlayService.class), connection, Context.BIND_AUTO_CREATE);
 //        this.callBackListener = callBackListener;
 //    }
-    public void startPlayService (Context context) {
+    public void startPlayService(Context context) {
         context.startService(new Intent(context, PlayService.class));
     }
+
     public void unBindService(Context context) {
         context.unbindService(connection);
 //        this.callBackListener = null;
     }
+
     public void stopPlayService(Context context) {
         context.stopService(new Intent(context, PlayService.class));
     }
+
     public Track getNowSong() {
         if (position < songs.size()) {
             return songs.get(position);
         }
         return null;
     }
+
     public boolean next() {
         if (position + 1 < songs.size()) {
             position++;
@@ -114,7 +127,9 @@ public class PlayManager {
             return false;
         }
     }
+
     private int duration = 0;
+
     public int getDuration() {
         return duration;
     }
@@ -129,7 +144,7 @@ public class PlayManager {
 
     }
 
-//    public void playOrPause() {
+    //    public void playOrPause() {
 //        try {
 //            if (playService != null) {
 //                if (playService.isPlaying()) {
@@ -149,6 +164,7 @@ public class PlayManager {
             listener.publish(0);
         }
     }
+
     public void pause() {
         Log.d(TAG, "Pause" + String.valueOf(position));
         playService.pause();
@@ -164,6 +180,7 @@ public class PlayManager {
             listeners.add(listener);
         }
     }
+
     public void removeOnPlayEventListener(OnPlayEventListener listener) {
         listeners.remove(listener);
     }
@@ -179,6 +196,7 @@ public class PlayManager {
             handler.postDelayed(this, 1000);
         }
     };
+
     public void seekTo(int progress) {
         playService.seekTo(progress);
     }

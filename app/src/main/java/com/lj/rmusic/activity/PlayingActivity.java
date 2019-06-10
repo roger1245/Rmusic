@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -24,6 +26,7 @@ import com.lj.rmusic.util.TextUtil;
 import com.lj.rmusic.widget.lrc.LrcRow;
 import com.lj.rmusic.widget.lrc.LrcView;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, OnPlayEventListener {
@@ -40,22 +43,45 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
     private SeekBar sbSeekBar;
     private TextView nowTime;
     private TextView maxTime;
-    private boolean isDraggingProgress  = false;
+    private boolean isDraggingProgress = false;
     private SQLiteDatabase database;
     private int lastProgress;
     private LrcView mLrcView;
+    private MyHandler handler;
+
+    private boolean isFirstCreate = true;
+
+    private static class MyHandler extends Handler {
+        private final WeakReference<PlayingActivity> mActivity;
+
+        public MyHandler(PlayingActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            PlayingActivity activity = mActivity.get();
+            if (activity != null) {
+//                Log.d(TAG, activity.playManager.getDuration() + "");
+                activity.sbSeekBar.setMax(activity.playManager.getDuration());
+                activity.maxTime.setText(TextUtil.makeShortTimeString(activity.playManager.getDuration()));
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
         playManager = PlayManager.getInstance();
+
         database = new TrackBaseHelper(this).getWritableDatabase();
         init();
         initData();
         initLrcView();
         playManager.addOnPlayEventListener(this);
     }
+
     private void init() {
         image = findViewById(R.id.play_image_view);
         star = findViewById(R.id.play_star);
@@ -69,27 +95,38 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
         maxTime = findViewById(R.id.play_max_time);
         mLrcView = findViewById(R.id.play_lrc_view);
     }
+
     private void initLrcView() {
 
         mLrcView.setOnSeekToListener(onSeekToListener);
-//        mLrcView.setOnLrcClickListener();
+//        mLrcView.setOnLrcClickListener(this);
     }
+
     LrcView.OnSeekToListener onSeekToListener = new LrcView.OnSeekToListener() {
 
         @Override
         public void onSeekTo(int progress) {
-//            playManager.seekTo(progress);
+            if (playManager.isPlaying()) {
+
+                playManager.seekTo(progress);
+            }
         }
     };
 
 
     private void initData() {
+
+        handler = new MyHandler(this);
+        playManager.setHandler2(handler);
+
+
         upDateUI();
 //        sbSeekBar.setOnSeekBarChangeListener(this);
         move_forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playManager.next();
+                button.setImageResource(R.drawable.ic_play_running);
                 upDateUI();
             }
         });
@@ -97,6 +134,7 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
             @Override
             public void onClick(View v) {
                 playManager.pre();
+                button.setImageResource(R.drawable.ic_play_running);
                 upDateUI();
             }
         });
@@ -111,7 +149,6 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
                     playManager.play();
 
                 }
-
                 upDateUI();
             }
         });
@@ -119,10 +156,10 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
             @Override
             public void onClick(View v) {
 
-                Cursor cursor = queryTracks("tracks", "song = ?", new String[] {playManager.getNowSong().getName()});
+                Cursor cursor = queryTracks("tracks", "song = ?", new String[]{playManager.getNowSong().getName()});
                 if (cursor.getCount() >= 1) {
                     star.setImageResource(R.drawable.ic_star_off);
-                    database.delete("tracks", "song = ?", new String[] {playManager.getNowSong().getName()});
+                    database.delete("tracks", "song = ?", new String[]{playManager.getNowSong().getName()});
 
                 } else {
                     star.setImageResource(R.drawable.ic_star_on);
@@ -137,10 +174,10 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Cursor cursor = queryTracks("trackslike","song = ?", new String[] {playManager.getNowSong().getName()});
+                Cursor cursor = queryTracks("trackslike", "song = ?", new String[]{playManager.getNowSong().getName()});
                 if (cursor.getCount() >= 1) {
                     like.setImageResource(R.drawable.ic_like_off);
-                    database.delete("trackslike", "song = ?", new String[] {playManager.getNowSong().getName()});
+                    database.delete("trackslike", "song = ?", new String[]{playManager.getNowSong().getName()});
 
                 } else {
                     like.setImageResource(R.drawable.ic_like_on);
@@ -153,46 +190,34 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
             }
         });
         sbSeekBar.setOnSeekBarChangeListener(this);
-//        callback = new ServiceCallback() {
-//            @Override
-//            public void duration(final int millsec) {
-////                runOnUiThread(new Runnable() {
-////                    @Override
-////                    public void run() {
-////                        Log.d(TAG, "" + millsec);
-////                        maxTime.setText(TextUtil.makeShortTimeString(millsec));
-////                    }
-////                });
-////                Log.d
-//                Log.d(TAG, "" +"322222222222222"+ millsec);
-//                maxTime.setText(TextUtil.makeShortTimeString(millsec));
-//            }};
     }
+
     private void upDateUI() {
-        lastProgress = 0;
-        sbSeekBar.setProgress(0);
-        sbSeekBar.setMax(playManager.getDuration());
-        maxTime.setText(TextUtil.makeShortTimeString(playManager.getDuration()));
-        Cursor cursor = queryTracks("tracks", "song = ?", new String[] {playManager.getNowSong().getName()});
+
+
+        if (isFirstCreate) {
+            sbSeekBar.setMax(playManager.getDuration());
+            maxTime.setText(TextUtil.makeShortTimeString(playManager.getDuration()));
+            isFirstCreate = false;
+        }
+
+        Cursor cursor = queryTracks("tracks", "song = ?", new String[]{playManager.getNowSong().getName()});
         if (cursor.getCount() >= 1) {
             star.setImageResource(R.drawable.ic_star_on);
         } else {
             star.setImageResource(R.drawable.ic_star_off);
         }
         cursor.close();
-        Cursor cursor2 = queryTracks("trackslike", "song = ?", new String[] {playManager.getNowSong().getName()});
+        Cursor cursor2 = queryTracks("trackslike", "song = ?", new String[]{playManager.getNowSong().getName()});
         if (cursor2.getCount() >= 1) {
             like.setImageResource(R.drawable.ic_like_on);
         } else {
             like.setImageResource(R.drawable.ic_like_off);
         }
         cursor2.close();
-//        Log.d(TAG, playManager.getNowSong().getName());
+
         ImageLoader.build(this).bindBitmap(playManager.getNowSong().getAl().getPicUrl(), image);
         singer.setText(playManager.getNowSong().getArs().get(0).getName());
-//        Log.d(TAG, String.valueOf(playManager.getDuration()));
-//        maxTime.setText(TextUtil.makeShortTimeString(playManager.getDuration()));
-//        checkIfStar();
         SongPresenter.fetchLrc(playManager.getNowSong().getId(), new CallBackListener() {
             @Override
             public void showResponse(String response) {
@@ -216,19 +241,20 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
     }
 
 
-
     private Cursor queryTracks(String table, String where, String[] args) {
-        Cursor cursor = database.query(table, new String[] {"song"}, where, args, null, null, null);
+        Cursor cursor = database.query(table, new String[]{"song"}, where, args, null, null, null);
         return cursor;
     }
-
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        playManager.setHandler2(null);
         playManager.removeOnPlayEventListener(this);
+
     }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (Math.abs(progress - lastProgress) >= DateUtils.SECOND_IN_MILLIS) {
@@ -245,38 +271,35 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         int progress = seekBar.getProgress();
-        Log.d(TAG, "onStop");
         if (playManager.isPlaying()) {
 
             playManager.seekTo(progress);
         }
+        isDraggingProgress = false;
     }
 
 
     @Override
     public void publish(int progress) {
-//        Log.d(TAG, "progress"  + progress);
 
+//        Log.d(TAG, "" + progress);
         this.lastProgress = progress;
         if (!isDraggingProgress) {
+//            Log.d(TAG, "this");
             sbSeekBar.setProgress(progress);
+            mLrcView.seekTo(progress, true, true);
         }
         nowTime.setText(TextUtil.makeShortTimeString(progress));
     }
+
     public void updateLrc(String response) {
 
         List<LrcRow> list = ParseUtil.getLrcRows(response);
-        Log.d(TAG, list.size() + "this is size");
-        Log.d(TAG, list.get(0).toString());
+//        Log.d(TAG, list.size() + "this is size");
+//        Log.d(TAG, list.get(0).toString());
         if (list != null && list.size() > 0) {
-//            mTryGetLrc.setVisibility(View.INVISIBLE);
-            Log.d(TAG, "this ddddddddddddddddddsdafefae" + list.get(0).toString());
             mLrcView.setLrcRows(list);
         }
-//        } else {
-////            mTryGetLrc.setVisibility(View.VISIBLE);
-////            mLrcView.reset();
-//        }
     }
 
 }

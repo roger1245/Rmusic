@@ -14,7 +14,7 @@ public class TextUtil {
         mins = millsec /1000 / 60;
         secs = millsec / 1000 % 60;
         Log.d(TAG, mins + "   " + secs);
-        final String durationFormat = "%2d:%2d";
+        final String durationFormat = "%02d:%02d";
         return String.format(durationFormat,mins, secs);
     }
 }
