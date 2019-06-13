@@ -37,15 +37,18 @@
                         android:id="@+id/front_image_view_relative"
                         android:layout_width="match_parent"
                         android:layout_marginTop="42dp"
-                        android:layout_height="238dp">
+                        android:layout_height="400dp">
                         <ImageView
                             android:id="@+id/front_image_view"
                             android:layout_width="220dp"
                             android:layout_height="220dp"
-                            android:layout_alignParentTop="true"
                             android:layout_centerInParent="true"
 
                             android:scaleType="fitCenter" />
+                        <com.lj.rmusic.widget.jingyuntexiao.DiffuseView
+                            android:id="@+id/front_diffuseview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
                     </RelativeLayout>
                     <TextView
                         android:id="@+id/front_song_name"

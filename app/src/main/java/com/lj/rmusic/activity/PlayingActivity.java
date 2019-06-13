@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -78,7 +77,7 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
         database = new TrackBaseHelper(this).getWritableDatabase();
         init();
         initData();
-        initLrcView();
+//        initLrcView();
         playManager.addOnPlayEventListener(this);
     }
 
@@ -96,22 +95,22 @@ public class PlayingActivity extends AppCompatActivity implements SeekBar.OnSeek
         mLrcView = findViewById(R.id.play_lrc_view);
     }
 
-    private void initLrcView() {
+//    private void initLrcView() {
+//
+////        mLrcView.setOnSeekToListener(onSeekToListener);
+////        mLrcView.setOnLrcClickListener(this);
+//    }
 
-        mLrcView.setOnSeekToListener(onSeekToListener);
-//        mLrcView.setOnLrcClickListener(this);
-    }
-
-    LrcView.OnSeekToListener onSeekToListener = new LrcView.OnSeekToListener() {
-
-        @Override
-        public void onSeekTo(int progress) {
-            if (playManager.isPlaying()) {
-
-                playManager.seekTo(progress);
-            }
-        }
-    };
+//    LrcView.OnSeekToListener onSeekToListener = new LrcView.OnSeekToListener() {
+//
+//        @Override
+//        public void onSeekTo(int progress) {
+//            if (playManager.isPlaying()) {
+//
+//                playManager.seekTo(progress);
+//            }
+//        }
+//    };
 
 
     private void initData() {

@@ -1,6 +1,10 @@
 package com.lj.rmusic.activity;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.Outline;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -8,6 +12,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +26,7 @@ import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.interfaceO.ISongView;
 import com.lj.rmusic.service.PlayManager;
 import com.lj.rmusic.util.ApiUtil;
+import com.lj.rmusic.widget.jingyuntexiao.DiffuseView;
 
 public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongView>> implements ISongView {
     private DrawerLayout mDrawerLayout;
@@ -29,6 +36,7 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     private TextView albumName;
     private TextView singer;
     private TextView songName;
+    private DiffuseView diffuseView;
 
 //    private PlayService.LocalService mLocalService;
 //    private PlayService playService;
@@ -60,6 +68,8 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     }
 
     private void init() {
+        diffuseView = findViewById(R.id.front_diffuseview);
+        diffuseView.start();
         singer = findViewById(R.id.front_song_singer);
         songName = findViewById(R.id.front_song_name);
         roundImage = findViewById(R.id.front_image_view);
@@ -129,6 +139,26 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
             songName.setText(playManager.getNowSong().getName());
             singer.setText(playManager.getNowSong().getArs().get(0).getName());
             ImageLoader.build(this).bindBitmap(playManager.getNowSong().getAl().getPicUrl(), roundImage);
+            if (Build.VERSION.SDK_INT >= 21) {
+                //裁剪
+                roundImage.setOutlineProvider(new ViewOutlineProvider() {
+                    @Override
+                    public void getOutline(View view, Outline outline) {
+                        int width = roundImage.getWidth();
+                        int height = roundImage.getHeight();
+                        outline.setOval(0, 0, width, height);
+                    }
+                });
+                roundImage.setClipToOutline(true);
+
+                //属性动画让roundImage旋转起来
+                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(roundImage, "rotation", 0, 360);
+                objectAnimator.setDuration(15000);
+                objectAnimator.setRepeatMode(ValueAnimator.RESTART);
+                objectAnimator.setInterpolator(new LinearInterpolator());
+                objectAnimator.setRepeatCount(-1);
+                objectAnimator.start();
+            }
         }
     }
 
