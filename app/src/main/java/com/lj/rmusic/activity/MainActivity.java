@@ -10,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -26,9 +27,14 @@ import com.lj.rmusic.bean.PlayList;
 import com.lj.rmusic.interfaceO.ISongView;
 import com.lj.rmusic.service.PlayManager;
 import com.lj.rmusic.util.ApiUtil;
+import com.lj.rmusic.widget.SpringActionMenu.ActionButtonItems;
+import com.lj.rmusic.widget.SpringActionMenu.ActionMenu;
+import com.lj.rmusic.widget.SpringActionMenu.OnActionItemClickListener;
 import com.lj.rmusic.widget.jingyuntexiao.DiffuseView;
 
 public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongView>> implements ISongView {
+
+    private static final String TAG = "MainActivity";
     private DrawerLayout mDrawerLayout;
     private PlayManager playManager;
     private ImageView roundImage;
@@ -37,23 +43,7 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
     private TextView singer;
     private TextView songName;
     private DiffuseView diffuseView;
-
-//    private PlayService.LocalService mLocalService;
-//    private PlayService playService;
-//    private ServiceConnection connection = new ServiceConnection() {
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-//            mLocalService = (PlayService.LocalService) service;
-//            playService = mLocalService.getService();
-//
-//        }
-//
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-//            mLocalService = null;
-//            playService = null;
-//        }
-//    };
+    private ActionMenu actionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +79,39 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_setting);
         }
+
+        actionMenu = findViewById(R.id.action_menu);
+        actionMenu.addView(R.drawable.ic_mood_clam);
+        actionMenu.addView(R.drawable.ic_mood_exciting);
+        actionMenu.addView(R.drawable.ic_mood_happy);
+        actionMenu.addView(R.drawable.ic_mood_unhappy);
+        actionMenu.setItemClickListener(new OnActionItemClickListener() {
+            @Override
+            public void onItemClick(int index) {
+                ActionButtonItems actionButtonItems = (ActionButtonItems)actionMenu.getChildAt(0);
+                switch (index) {
+                    case 1:
+                        actionButtonItems.setBitmapIcon(R.drawable.ic_mood_clam);
+                        break;
+                    case 2:
+                        actionButtonItems.setBitmapIcon(R.drawable.ic_mood_exciting);
+                        break;
+                    case 3:
+                        actionButtonItems.setBitmapIcon(R.drawable.ic_mood_happy);
+                        break;
+                    case 4:
+                        actionButtonItems.setBitmapIcon(R.drawable.ic_mood_unhappy);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(boolean isOpen) {
+
+            }
+        });
 
 
     }
@@ -139,6 +162,7 @@ public class MainActivity extends BaseActivity<ISongView, BasePresenter<ISongVie
             songName.setText(playManager.getNowSong().getName());
             singer.setText(playManager.getNowSong().getArs().get(0).getName());
             ImageLoader.build(this).bindBitmap(playManager.getNowSong().getAl().getPicUrl(), roundImage);
+            Log.d(TAG, playManager.getNowSong().getAl().getPicUrl());
             if (Build.VERSION.SDK_INT >= 21) {
                 //裁剪
                 roundImage.setOutlineProvider(new ViewOutlineProvider() {

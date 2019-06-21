@@ -55,7 +55,7 @@ public class DiffuseView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mMaxRadiusWidth = Math.min(getWidth() / 2, getHeight() / 2);
+        mMaxRadiusWidth = Math.min(getMeasuredHeight() / 2, getMeasuredWidth() / 2);
     }
 
     @Override
